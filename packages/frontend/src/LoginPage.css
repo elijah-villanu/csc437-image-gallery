@@ -1,0 +1,9 @@
+.LoginPage-form > * {
+    display: block;
+}
+.LoginPage-form > label {
+    margin-top: 1em;
+}
+.LoginPage-form > input[type="submit"] {
+    margin-top: 1em;
+}

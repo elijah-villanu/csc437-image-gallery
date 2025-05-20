@@ -1,0 +1,34 @@
+.ImageGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 16em);
+    grid-template-rows: 16em;
+    gap: 2em;
+}
+
+.ImageGrid-photo-container {
+    border: 1px solid grey;
+    padding: 0.5em;
+    overflow: hidden;
+}
+
+.ImageGrid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ImageDetails-back {
+    display: inline-block;
+    margin-bottom: 1em;
+    color: white;
+    background-color: mediumblue;
+    padding: 0.5em 1em;
+    border-radius: 0.25em;
+    cursor: pointer;
+    border: 0;
+}
+
+.ImageDetails-img {
+    max-width: 100%;
+    max-height: 60vh;
+}
