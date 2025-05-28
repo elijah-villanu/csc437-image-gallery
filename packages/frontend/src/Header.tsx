@@ -1,4 +1,5 @@
 import "./Header.css";
+import { Link } from "react-router";
 
 export function Header() {
     return (
@@ -9,9 +10,9 @@ export function Header() {
                     Some switch (dark mode?) <input type="checkbox" />
                 </label>
                 <nav>
-                    <a href="/">Home</a>
-                    <a href="/upload">Upload</a>
-                    <a href="/login">Log in</a>
+                    <Link to="/">Home</Link>
+                    <Link to="/upload">Upload</Link>
+                    <Link to="/login">Log in</Link>
                 </nav>
             </div>
         </header>

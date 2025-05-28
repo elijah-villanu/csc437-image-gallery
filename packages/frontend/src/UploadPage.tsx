@@ -1,10 +1,8 @@
-import { MainLayout } from "./MainLayout.tsx";
-
 export function UploadPage() {
     return (
-        <MainLayout>
+        <div>
             <h2>Upload</h2>
             <p>TODO</p>
-        </MainLayout>
+        </div>
     );
 }
