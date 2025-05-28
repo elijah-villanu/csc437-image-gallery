@@ -7,6 +7,7 @@ import { Route, Routes } from "react-router";
 import { MainLayout } from "./MainLayout.tsx";
 import { useState } from "react";
 import { fetchDataFromServer } from "./MockAppData.ts";
+import { ValidRoutes } from "../../backend/src/shared/ValidRoutes.ts";
 
 function App() {
     const [imageData, _setImageData] = useState(fetchDataFromServer);
@@ -15,9 +16,9 @@ function App() {
         <Routes>
             <Route path="/" element={<MainLayout />}>
                 <Route index element={<AllImages data={imageData}/>} />
-                <Route path="/upload" element={<UploadPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/images/:imageId" element={<ImageDetails data={imageData}/>} />
+                <Route path={ValidRoutes.UPLOAD} element={<UploadPage />} />
+                <Route path={ValidRoutes.LOGIN} element={<LoginPage />} />
+                <Route path={ValidRoutes.IMAGES} element={<ImageDetails data={imageData}/>} />
             </Route>
             
         </Routes>
