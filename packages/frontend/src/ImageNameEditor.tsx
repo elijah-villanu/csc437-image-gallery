@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from "react";
 import { ValidRoutes } from "../../backend/src/shared/ValidRoutes";
 import type { IApiImageData } from "../../backend/src/shared/ApiImageData";

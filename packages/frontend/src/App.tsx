@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { AllImages } from "./images/AllImages.tsx";
 import { ImageDetails } from "./images/ImageDetails.tsx";
 import { UploadPage } from "./UploadPage.tsx";
