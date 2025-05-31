@@ -1,0 +1,86 @@
+import express from "express";
+import { ImageProvider } from "../ImageProvider";
+import { ObjectId } from "mongodb";
+
+const MAX_NAME_LENGTH = 100;
+
+export function registerImageRoutes(app: express.Application, imageProvider: ImageProvider) {
+    app.get("/api/images", (req, res) => {
+        // Artificially delay response to show loading screen
+        function waitDuration(numMs: number): Promise<void> {
+            return new Promise(resolve => setTimeout(resolve, numMs));
+        }
+
+        waitDuration(1500)
+            .then(() => imageProvider.getAllImagesWithAuthors())
+            .then(images => {
+                res.json(images);
+            })
+    });
+
+
+    app.get("/api/images/search", (req, res) => {
+        // Grabs query param from user
+        const query = req.query.q;
+        if (typeof query !== "string") {
+            res.status(400).send({
+                error: "Bad Request",
+                message: "Details about exactly how the request was malformed"
+            });
+
+            //need the return for ts to know its a string
+            return;
+        }
+        //from here ts knows its a string
+
+        imageProvider.getAllImagesWithAuthors(query)
+            .then(result => {
+                res.json(result)
+            });
+    });
+
+
+    // Use put for image edits since it is idompotent
+    // Needs middleware for body
+    app.put("/api/images/:id", express.json(), (req, res) => {
+        const imgId = req.params.id
+        const newName = req.body.name
+
+        if (!ObjectId.isValid(imgId)) {
+            res.status(404).send({
+                error: "Not Found",
+                message: "Image does not exist"
+            });
+            return;
+        }
+
+        if (typeof newName !== "string") {
+            res.status(400).send({
+                error: "Bad Request",
+                message: "Details about exactly how the request was malformed"
+            });
+            return;
+        }
+
+        // Check if name is less than 100 chars
+        if (newName.length > MAX_NAME_LENGTH) {
+            res.status(422).send({
+                error: "Unprocessable Entity",
+                message: `Image name exceeds ${MAX_NAME_LENGTH} characters`
+            });
+            return;
+        }
+
+        imageProvider.updateImageName(imgId, newName)
+            .then((count) => {
+                //If none was found
+                if (count === 0) {
+                    res.status(404).send({
+                        error: "Not Found",
+                        message: "Image does not exist"
+                    });
+                }
+            })
+            .then(() => res.status(204).send("No content"))
+    })
+}

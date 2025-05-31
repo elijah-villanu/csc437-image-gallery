@@ -1,0 +1,43 @@
+### Get all images
+# This is a comment
+GET http://localhost:3000/api/images
+
+### Get image from query search
+GET http://localhost:3000/api/images/search?q=Shiba
+
+### Update image name
+PUT http://localhost:3000/api/images/683a749314a53bbcf529857d
+Content-Type: application/json
+
+{"name": "Huskies but modified!"}
+
+### BAD REQ 404 resource not found, Invalid image id (too short for an objectId)
+PUT http://localhost:3000/api/images/123
+Content-Type: application/json
+
+{"name": "Wont Work!"}
+
+### BAD REQ 404 resource not found, non existant image id
+PUT http://localhost:3000/api/images/683a749314a53bbcf529857z
+Content-Type: application/json
+
+{"name": "Wont Work!"}
+
+### BAD REQ 400 Bad Request
+PUT http://localhost:3000/api/images/683a749314a53bbcf529857c
+Content-Type: application/json
+
+{"name": 1233333}
+
+### BAD REQ 422 Name > 100 characters
+PUT http://localhost:3000/api/images/683a749314a53bbcf529857c
+Content-Type: application/json
+
+{"name": "fdnskjnsjknejsksssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"}
+
+### A second example.  Each request must be delimited by a triple hash
+POST http://localhost:3000/api/test
+Content-Type: application/json # Content-Type header is a must if you're sending JSON
+# Request body separated from headers by newline
+
+{ "a": 1, "b": 2 }

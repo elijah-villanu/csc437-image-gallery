@@ -4,7 +4,7 @@ interface IImageDocument {
     _id: ObjectId;
     src: string;
     name: string;
-    authorId: string; // string
+    authorId: string;
 }
 
 export class ImageProvider {
@@ -18,8 +18,19 @@ export class ImageProvider {
         this.collection = this.mongoClient.db().collection(collectionName);
     }
 
-    async getAllImagesWithAuthors() {
-        const result = await this.collection.aggregate([
+    async getAllImagesWithAuthors(search?: string) {
+        const pipeline: any[] = [];
+
+        // Add a match stage only if search string is defined and non-empty
+        if (search && search.trim().length > 0) {
+            pipeline.push({
+                $match: {
+                    name: { $regex: search, $options: "i" }  // case-insensitive partial match
+                }
+            });
+        }
+
+        pipeline.push(
             {
                 $lookup: {
                     from: "users",
@@ -32,10 +43,9 @@ export class ImageProvider {
                 $unwind: "$author"
             },
             {
-
                 $project: {
-                    _id: 0, // <--- This excludes the original MongoDB _id field
-                    id: { $toString: "$_id" }, // this becomes the new "id" field
+                    _id: 0,
+                    id: { $toString: "$_id" },
                     src: 1,
                     name: 1,
                     author: {
@@ -43,12 +53,21 @@ export class ImageProvider {
                         username: "$author.username"
                     }
                 }
-
-
             }
-        ]).toArray();
+        );
 
-
-        return result;
+        return await this.collection.aggregate(pipeline).toArray();
     }
+
+    async updateImageName(imageId: string, newName: string): Promise<number> {
+        // Do keep in mind the type of _id in the DB is ObjectId
+        const result = await this.collection.updateOne(
+            { _id: new ObjectId(imageId) },
+            { $set: { name: newName }}
+        );
+
+        // Is a promise of matchedCount
+        return result.matchedCount
+}
+
 }
