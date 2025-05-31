@@ -1,16 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { useState } from "react";
 import { useParams } from "react-router";
-import type { IImageData } from "../MockAppData.ts";
+import type { IApiImageData } from "../../../backend/src/shared/ApiImageData.ts";
+import { ImageNameEditor } from "../ImageNameEditor.tsx";
 
 interface IImageDetailsProps{
-    data:IImageData[]
+    data:IApiImageData[],
+    fetchState: boolean,
+    errorState: boolean,
+    handleChange: (arg:IApiImageData[]) => void
 }
 
 export function ImageDetails(props:IImageDetailsProps) {
-    const [imageData, _setImageData] = useState(props.data);
     const { imageId } = useParams()
-    const image = imageData.find(image => image.id === imageId);
+
+    // When parent state changes (edit name), will rerender
+    const image = props.data.find(image => image.id === imageId);
     if (!image) {
         return <h2>Image not found</h2>;
     }
@@ -19,6 +22,7 @@ export function ImageDetails(props:IImageDetailsProps) {
         <div>
             <h2>{image.name}</h2>
             <p>By {image.author.username}</p>
+            <ImageNameEditor initialValue="" imageId={image.id} onEdit={props.handleChange}/>
             <img className="ImageDetails-img" src={image.src} alt={image.name} />
         </div>
     )
