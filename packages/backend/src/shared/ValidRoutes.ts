@@ -4,5 +4,6 @@ export const ValidRoutes = {
     UPLOAD: "/upload",
     IMAGES: "/images/:imageId",
     ALLIMG: "/images",
-    APISEARCH: "/images/search?"
+    APISEARCH: "/images/search?",
+    REGISTER: "/register"
 }

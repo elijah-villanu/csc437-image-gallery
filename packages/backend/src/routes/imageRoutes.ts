@@ -49,15 +49,12 @@ export function registerImageRoutes(app: express.Application, imageProvider: Ima
 
         //Check if the user editing photo is the author
         //returns true if author is the requesting user (req.user)
-
         if (req.user) {
             imageProvider.checkAuthor(req.user, imgId).then((verified) => {
                 if (!verified) {
                     res.status(403).send("Unauthorized request")
                     return;
                 } else {
-
-                    //If author is the one requesting edit
                     if (!ObjectId.isValid(imgId)) {
                         res.status(404).send({
                             error: "Not Found",

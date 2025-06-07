@@ -5,21 +5,23 @@ import { UploadPage } from "./UploadPage.tsx";
 import { LoginPage } from "./LoginPage.tsx";
 import { Route, Routes } from "react-router";
 import { MainLayout } from "./MainLayout.tsx";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ValidRoutes } from "../../backend/src/shared/ValidRoutes.ts";
 import type { IApiImageData } from "../../backend/src/shared/ApiImageData.ts";
+import { ProtectedRoute } from "./ProtectedRoutes.tsx";
 
 function App() {
     const [imageData, _setImageData] = useState<IApiImageData[]>([]);
     const [isFetching, setIsFetching] = useState(true);
     const [errorOcc, setErrorOcc] = useState(false);
     const [searchbox, setSearchbox] = useState("");
-
+    const [token, setToken] = useState("")
     const ref = useRef(0);
 
     function imgDataChange(updatedData: IApiImageData[]) {
         _setImageData([...updatedData])
     }
+    
 
 
     async function imageRequest(request: string) {
@@ -31,7 +33,10 @@ function App() {
 
         try {
             setIsFetching(true)
-            const response = await fetch(request);
+            const response = await fetch(request,{
+                method: "GET",
+                headers: {"Authorization": `Bearer ${token}`}
+            });
 
             // Check for subsequent requests
             // Ignore if not the most recent request
@@ -81,18 +86,23 @@ function App() {
         setSearchbox(searchString)
     }
 
-    useEffect(() => {
+    
+    // When token set, get another fetch
+    function handleSetToken(newToken:string){
+        setToken(newToken);
         imageRequest(`/api${ValidRoutes.ALLIMG}`);
-    }, []);
+
+    }
 
     return (
         <Routes>
             <Route path="/" element={<MainLayout />}>
-                <Route index element={<AllImages data={imageData} fetchState={isFetching} errorState={errorOcc}
-                    searchPanel={<ImageSearchForm searchString={searchbox} onSearchRequested={handleImageSearch} onSearchStringChange={handleSearchBox} />} />} />
-                <Route path={ValidRoutes.UPLOAD} element={<UploadPage />} />
-                <Route path={ValidRoutes.LOGIN} element={<LoginPage />} />
-                <Route path={ValidRoutes.IMAGES} element={<ImageDetails data={imageData} fetchState={isFetching} errorState={errorOcc} handleChange={imgDataChange} />} />
+                <Route index element={<ProtectedRoute authToken={token}><AllImages data={imageData} fetchState={isFetching} errorState={errorOcc}
+                    searchPanel={<ImageSearchForm searchString={searchbox} onSearchRequested={handleImageSearch} onSearchStringChange={handleSearchBox} />} /></ProtectedRoute>} />
+                <Route path={ValidRoutes.UPLOAD} element={<ProtectedRoute authToken={token}><UploadPage /></ProtectedRoute>} />
+                <Route path={ValidRoutes.LOGIN} element={<LoginPage isRegistering={false} addToken={handleSetToken} />} />
+                <Route path={ValidRoutes.REGISTER} element={<LoginPage isRegistering={true} addToken={handleSetToken} />} />
+                <Route path={ValidRoutes.IMAGES} element={<ProtectedRoute authToken={token}><ImageDetails data={imageData} fetchState={isFetching} errorState={errorOcc} handleChange={imgDataChange} /></ProtectedRoute>} />
             </Route>
         </Routes>
     );
