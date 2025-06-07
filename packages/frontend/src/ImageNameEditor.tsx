@@ -28,6 +28,22 @@ export function ImageNameEditor(props: INameEditorProps) {
                 return;
             }
 
+            const putResponse = await fetch(`/api${ValidRoutes.ALLIMG}/${props.imageId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ name: input })
+            })
+
+            if (putResponse.status >= 400) {
+                setErrorOcc(true);
+                return;
+            }
+
+            console.log("Successful request")
+
+            // Parsing is an async function
             const parsed: IApiImageData[] = await response.json();
 
             // Directly mutates parsed array
@@ -51,7 +67,7 @@ export function ImageNameEditor(props: INameEditorProps) {
             setIsFetching(false);
             setIsEditingName(false);
             setInput("");
-        } 
+        }
     }
 
     if (isEditingName) {

@@ -1,4 +1,6 @@
 import { Collection, MongoClient, ObjectId } from "mongodb";
+import type { IAuthTokenPayload } from "routes/authRoutes";
+
 
 interface IImageDocument {
     _id: ObjectId;
@@ -63,11 +65,21 @@ export class ImageProvider {
         // Do keep in mind the type of _id in the DB is ObjectId
         const result = await this.collection.updateOne(
             { _id: new ObjectId(imageId) },
-            { $set: { name: newName }}
+            { $set: { name: newName } }
         );
 
         // Is a promise of matchedCount
         return result.matchedCount
-}
+    }
+
+    async checkAuthor(reqUser:IAuthTokenPayload, imgId:string){
+        //on image collection
+        const result = await this.collection.findOne({id:imgId})
+        if(result){
+            if(result.authorId === reqUser.username){
+                return true
+            } 
+        } else return false
+    }
 
 }

@@ -1,13 +1,14 @@
-### Get all images
-# This is a comment
+### Get all images logged in
 GET http://localhost:3000/api/images
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNodW5reWxvdmVyMjMiLCJpYXQiOjE3NDkyNTU3OTgsImV4cCI6MTc0OTM0MjE5OH0.EX0UE3SuuEa_IJ8A8WqeWUwCuzwmySWqGEAGtaFZBNg
 
 ### Get image from query search
 GET http://localhost:3000/api/images/search?q=Shiba
 
 ### Update image name
-PUT http://localhost:3000/api/images/683a749314a53bbcf529857d
+PUT http://localhost:3000/api/images/683a749314a53bbcf5298580
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNodW5reWxvdmVyMjMiLCJpYXQiOjE3NDkyNTYyNDYsImV4cCI6MTc0OTM0MjY0Nn0.UxsGsAHt_uHFTDCULI7sbh4lR2dfEK6LyBYPeCVFPUo
 
 {"name": "Huskies but modified!"}
 

@@ -1,0 +1,36 @@
+### New user registration 201
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{ "username": "chunkylover23", "password": "password" }
+
+### New User registration: user already exists 409
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{ "username": "newuser", "password": "password" }
+
+### New User registration: malformed request body 400
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{ "us": "newuser3", "pas": "password" }
+
+### Login User 
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{ "username": "chunkylover23", "password": "password" }
+
+### Login User: 400 Error
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{ "username": "", "password": "" }
+
+
+### Login User: 401 Incorrect credentials
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{ "username": "newuser", "password": "passwor" }

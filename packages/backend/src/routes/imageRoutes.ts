@@ -1,6 +1,7 @@
 import express from "express";
 import { ImageProvider } from "../ImageProvider";
 import { ObjectId } from "mongodb";
+import { ValidRoutes } from "../shared/ValidRoutes";
 
 const MAX_NAME_LENGTH = 100;
 
@@ -11,7 +12,7 @@ export function registerImageRoutes(app: express.Application, imageProvider: Ima
             return new Promise(resolve => setTimeout(resolve, numMs));
         }
 
-        waitDuration(1500)
+        waitDuration(Math.random() * 5000)
             .then(() => imageProvider.getAllImagesWithAuthors())
             .then(images => {
                 res.json(images);
@@ -19,7 +20,7 @@ export function registerImageRoutes(app: express.Application, imageProvider: Ima
     });
 
 
-    app.get("/api/images/search", (req, res) => {
+    app.get(`/api${ValidRoutes.APISEARCH}`, (req, res) => {
         // Grabs query param from user
         const query = req.query.q;
         if (typeof query !== "string") {
@@ -46,41 +47,57 @@ export function registerImageRoutes(app: express.Application, imageProvider: Ima
         const imgId = req.params.id
         const newName = req.body.name
 
-        if (!ObjectId.isValid(imgId)) {
-            res.status(404).send({
-                error: "Not Found",
-                message: "Image does not exist"
-            });
-            return;
-        }
+        //Check if the user editing photo is the author
+        //returns true if author is the requesting user (req.user)
 
-        if (typeof newName !== "string") {
-            res.status(400).send({
-                error: "Bad Request",
-                message: "Details about exactly how the request was malformed"
-            });
-            return;
-        }
+        if (req.user) {
+            imageProvider.checkAuthor(req.user, imgId).then((verified) => {
+                if (!verified) {
+                    res.status(403).send("Unauthorized request")
+                    return;
+                } else {
 
-        // Check if name is less than 100 chars
-        if (newName.length > MAX_NAME_LENGTH) {
-            res.status(422).send({
-                error: "Unprocessable Entity",
-                message: `Image name exceeds ${MAX_NAME_LENGTH} characters`
-            });
-            return;
-        }
+                    //If author is the one requesting edit
+                    if (!ObjectId.isValid(imgId)) {
+                        res.status(404).send({
+                            error: "Not Found",
+                            message: "Image does not exist"
+                        });
+                        return;
+                    }
 
-        imageProvider.updateImageName(imgId, newName)
-            .then((count) => {
-                //If none was found
-                if (count === 0) {
-                    res.status(404).send({
-                        error: "Not Found",
-                        message: "Image does not exist"
-                    });
+                    if (typeof newName !== "string") {
+                        res.status(400).send({
+                            error: "Bad Request",
+                            message: "Details about exactly how the request was malformed"
+                        });
+                        return;
+                    }
+
+                    // Check if name is less than 100 chars
+                    if (newName.length > MAX_NAME_LENGTH) {
+                        res.status(422).send({
+                            error: "Unprocessable Entity",
+                            message: `Image name exceeds ${MAX_NAME_LENGTH} characters`
+                        });
+                        return;
+                    }
+
+                    imageProvider.updateImageName(imgId, newName)
+                        .then((count) => {
+                            //If none was found
+                            if (count === 0) {
+                                res.status(404).send({
+                                    error: "Not Found",
+                                    message: "Image does not exist"
+                                });
+                            }
+                        })
+                        .then(() => res.status(204).send("No content"))
                 }
             })
-            .then(() => res.status(204).send("No content"))
+
+        }
+
     })
 }
