@@ -9,12 +9,14 @@ import { CredProvider } from "./CredProvider";
 import type { IAuthTokenPayload } from "./routes/authRoutes";
 import jwt from "jsonwebtoken"
 
+
 dotenv.config(); // Read the .env file in the current working directory, and load values into process.env.
 const mongoClient = connectMongo(); // Connect to database
 
 const PORT = process.env.PORT || 3000;
 const STATIC_DIR = process.env.STATIC_DIR || "public";
 const JWT_SECRET = process.env.JWT_SECRET;
+const IMAGE_UPLOAD_DIR = process.env.IMAGE_UPLOAD_DIR || "uploads";
 
 const app = express();
 
@@ -24,6 +26,7 @@ const credProvider = new CredProvider(mongoClient);
 app.locals.JWT_SECRET = JWT_SECRET;
 
 app.use(express.static(STATIC_DIR));
+app.use("/uploads", express.static(IMAGE_UPLOAD_DIR))
 
 // Middleware
 app.use(express.json()) // for parsing application/json

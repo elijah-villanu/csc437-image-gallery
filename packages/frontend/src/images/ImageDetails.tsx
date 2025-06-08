@@ -21,7 +21,7 @@ export function ImageDetails(props:IImageDetailsProps) {
     return (
         <div>
             <h2>{image.name}</h2>
-            <p>By {image.author.username}</p>
+            <p>By {image.authorId}</p>
             <ImageNameEditor initialValue="" imageId={image.id} onEdit={props.handleChange}/>
             <img className="ImageDetails-img" src={image.src} alt={image.name} />
         </div>

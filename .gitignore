@@ -132,3 +132,7 @@ dist
 # macOS and IDE files
 .idea
 .DS_Store
+
+
+#file upload folder
+uploads

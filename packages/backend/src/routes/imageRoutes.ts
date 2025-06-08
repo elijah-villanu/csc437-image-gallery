@@ -1,7 +1,8 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { ImageProvider } from "../ImageProvider";
 import { ObjectId } from "mongodb";
 import { ValidRoutes } from "../shared/ValidRoutes";
+import { imageMiddlewareFactory, handleImageFileErrors } from "../imageUploadMiddleware";
 
 const MAX_NAME_LENGTH = 100;
 
@@ -40,6 +41,32 @@ export function registerImageRoutes(app: express.Application, imageProvider: Ima
             });
     });
 
+    // Multer will store files to disk
+    app.post(
+        "/api/images",
+        imageMiddlewareFactory.single("image"),
+        handleImageFileErrors,
+        (req: Request, res: Response) => {
+            // Final handler function after the above two middleware functions finish running
+            if (!req.file) {
+                res.status(400).send("File Not Found")
+                return;
+            }
+            if (!req.body) {
+                res.status(400).send("File Text Not Found")
+                return;
+            }
+            if (req.user) {
+                imageProvider.createImage(req.file.filename,req.body.name,req.user)
+                    .then((success) => {
+                        if(success){
+                            res.status(201)
+                        } else res.status(400).send("File Upload Failed")
+                    })
+                
+            }
+        }
+    );
 
     // Use put for image edits since it is idompotent
     // Needs middleware for body

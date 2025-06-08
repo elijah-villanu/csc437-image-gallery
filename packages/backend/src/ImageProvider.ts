@@ -3,7 +3,7 @@ import type { IAuthTokenPayload } from "routes/authRoutes";
 
 
 interface IImageDocument {
-    _id: ObjectId;
+    _id?: ObjectId;
     src: string;
     name: string;
     authorId: string;
@@ -20,45 +20,42 @@ export class ImageProvider {
         this.collection = this.mongoClient.db().collection(collectionName);
     }
 
-    async getAllImagesWithAuthors(search?: string) {
-        const pipeline: any[] = [];
+    async createImage(srcEnd: string, userFileName: string, reqUser: IAuthTokenPayload) {
+        const username = reqUser.username
+        const srcFull = `/uploads/${srcEnd}`
+        const result = await this.collection.insertOne(
+            {
+                src: srcFull,
+                name: userFileName,
+                authorId: username
+            },
+        );
+        if (result) {
+            return true
+        } else return false
+    }
 
-        // Add a match stage only if search string is defined and non-empty
+    async getAllImagesWithAuthors(search?: string) {
+        // Query images by name if search string given
+        const query: any = {};
         if (search && search.trim().length > 0) {
-            pipeline.push({
-                $match: {
-                    name: { $regex: search, $options: "i" }  // case-insensitive partial match
-                }
-            });
+            query.name = { $regex: search, $options: "i" };
         }
 
-        pipeline.push(
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "authorId",
-                    foreignField: "_id",
-                    as: "author"
-                }
-            },
-            {
-                $unwind: "$author"
-            },
-            {
-                $project: {
-                    _id: 0,
-                    id: { $toString: "$_id" },
-                    src: 1,
-                    name: 1,
-                    author: {
-                        id: "$author._id",
-                        username: "$author.username"
-                    }
-                }
-            }
-        );
+        const images = await this.collection.find(query).toArray();
 
-        return await this.collection.aggregate(pipeline).toArray();
+        // Replace author property with a user document with a fake email
+        const result = images.map(img => ({
+            ...img,
+            author: {
+                username: img.authorId,
+                email: "fake@email.com"
+            }
+        }));
+
+        return result;
+
+
     }
 
     async updateImageName(imageId: string, newName: string): Promise<number> {
@@ -72,13 +69,13 @@ export class ImageProvider {
         return result.matchedCount
     }
 
-    async checkAuthor(reqUser:IAuthTokenPayload, imgId:string){
+    async checkAuthor(reqUser: IAuthTokenPayload, imgId: string) {
         //on image collection
-        const result = await this.collection.findOne({id:imgId})
-        if(result){
-            if(result.authorId === reqUser.username){
+        const result = await this.collection.findOne({ id: imgId })
+        if (result) {
+            if (result.authorId === reqUser.username) {
                 return true
-            } 
+            }
         } else return false
     }
 

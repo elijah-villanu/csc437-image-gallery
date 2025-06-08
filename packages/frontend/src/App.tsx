@@ -99,7 +99,8 @@ function App() {
             <Route path="/" element={<MainLayout />}>
                 <Route index element={<ProtectedRoute authToken={token}><AllImages data={imageData} fetchState={isFetching} errorState={errorOcc}
                     searchPanel={<ImageSearchForm searchString={searchbox} onSearchRequested={handleImageSearch} onSearchStringChange={handleSearchBox} />} /></ProtectedRoute>} />
-                <Route path={ValidRoutes.UPLOAD} element={<ProtectedRoute authToken={token}><UploadPage /></ProtectedRoute>} />
+                <Route path={ValidRoutes.UPLOAD} element={<ProtectedRoute authToken={token}><UploadPage authToken={token}/></ProtectedRoute>} />
+                
                 <Route path={ValidRoutes.LOGIN} element={<LoginPage isRegistering={false} addToken={handleSetToken} />} />
                 <Route path={ValidRoutes.REGISTER} element={<LoginPage isRegistering={true} addToken={handleSetToken} />} />
                 <Route path={ValidRoutes.IMAGES} element={<ProtectedRoute authToken={token}><ImageDetails data={imageData} fetchState={isFetching} errorState={errorOcc} handleChange={imgDataChange} /></ProtectedRoute>} />
